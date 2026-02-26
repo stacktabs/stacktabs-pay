@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>StackTabs Activated</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+
+<body style="font-family:Arial;text-align:center;padding:60px">
+
+<h2>Payment Successful 🎉</h2>
+<p>Activating your Pro license...</p>
+
+<script>
+const params = new URLSearchParams(location.search);
+const EXTENSION_ID = params.get("ext");
+
+if(!EXTENSION_ID){
+  document.body.innerHTML="Invalid activation.";
+}else{
+
+  chrome.runtime.sendMessage(
+    EXTENSION_ID,
+    { type:"PAYMENT_SUCCESS" },
+    () => {
+      document.body.innerHTML =
+        "<h2>StackTabs Pro Activated ✅</h2><p>You can now return to the extension.</p>";
+    }
+  );
+
+}
+</script>
+
+</body>
+</html>
