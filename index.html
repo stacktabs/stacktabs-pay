@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Upgrade to StackTabs Pro</title>
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  background:#0b1020;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+}
+
+.card{
+  width:380px;
+  background:#121a33;
+  padding:34px;
+  border-radius:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+  text-align:center;
+}
+
+h1{
+  margin:0 0 10px 0;
+  font-size:26px;
+}
+
+.subtitle{
+  opacity:.8;
+  margin-bottom:20px;
+}
+
+.price{
+  font-size:30px;
+  font-weight:700;
+  margin:16px 0 18px;
+}
+
+.features{
+  text-align:left;
+  margin:18px 0 24px;
+  line-height:1.7;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  font-size:16px;
+  border:none;
+  border-radius:12px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+  font-weight:600;
+}
+
+button:hover{
+  background:#1d4ed8;
+}
+
+.small{
+  font-size:13px;
+  opacity:.75;
+  margin-top:12px;
+}
+.success{
+  color:#4ade80;
+}
+.error{
+  color:#f87171;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+  <h1>StackTabs Pro</h1>
+  <div class="subtitle">Unlock premium productivity features</div>
+
+  <div id="price" class="price">Loading price...</div>
+
+  <div class="features">
+    ✓ Unlimited Spaces<br>
+    ✓ Quick Save all windows<br>
+    ✓ Advanced reminders<br>
+    ✓ Restore entire workspaces<br>
+    ✓ Future AI productivity tools
+  </div>
+
+<button id="upgradeBtn">Upgrade Now</button>
+
+  <div id="status" class="small"></div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const EXT_ID = params.get("ext");
+
+let currency="USD";
+let amount=2.5;
+
+/* -------- Detect country for pricing -------- */
+async function detectCountry(){
+  try{
+    const res = await fetch("https://ipapi.co/json/");
+    const data = await res.json();
+
+    if(data.country === "IN"){
+      currency="INR";
+      amount=100;
+      document.getElementById("price").innerText="₹100 / month";
+    }else{
+      document.getElementById("price").innerText="$2.50 / month";
+    }
+  }catch{
+    document.getElementById("price").innerText="$2.50 / month";
+  }
+}
+detectCountry();
+
+/* -------- Simulated payment (replace later with Razorpay/Stripe) -------- */
+document.getElementById("upgradeBtn").onclick=()=>{
+
+  const status=document.getElementById("status");
+
+  if(!EXT_ID){
+    status.className="small error";
+    status.innerText="Extension not detected. Please open from StackTabs.";
+    return;
+  }
+
+  status.className="small";
+  status.innerText="Processing payment...";
+
+  /* simulate payment success */
+  setTimeout(()=>{
+
+    try{
+      chrome.runtime.sendMessage(
+        EXT_ID,
+        { type:"PAYMENT_SUCCESS" },
+        ()=>{}
+      );
+
+      status.className="small success";
+      status.innerText="Payment successful! You can now close this tab and return to StackTabs.";
+
+    }catch{
+      status.className="small error";
+      status.innerText="Could not contact extension. Please reopen dashboard.";
+    }
+
+  },2000);
+};
+</script>
+
+</body>
+</html>
