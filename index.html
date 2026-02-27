@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Redirecting…</title>
+<script>
+  // Forward ALL query parameters to success.html
+  const params = location.search || "";
+  location.replace("success.html" + params);
+</script>
+</head>
+<body>
+Redirecting…
+</body>
+</html>
