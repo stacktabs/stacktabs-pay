@@ -3,58 +3,53 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Activating StackTabs Pro…</title>
+<title>StackTabs Activation</title>
 <style>
 body{
-  font-family: Arial, sans-serif;
+  font-family: Arial;
   text-align:center;
   padding-top:80px;
   background:#0f172a;
   color:white;
 }
-.card{
+.box{
   background:#1e293b;
+  padding:30px;
+  border-radius:14px;
   display:inline-block;
-  padding:30px 40px;
-  border-radius:12px;
-  box-shadow:0 0 20px rgba(0,0,0,.4);
 }
-h1{margin:0 0 10px}
-small{opacity:.7}
 </style>
 </head>
 <body>
 
-<div class="card">
-  <h1>Activating StackTabs Pro…</h1>
-  <p>Please wait. This usually takes 2–3 seconds.</p>
-  <small>Do not close this tab</small>
+<div class="box">
+  <h2 id="status">Activating StackTabs Pro...</h2>
+  <p>You can close this tab after activation.</p>
 </div>
 
 <script>
 const params = new URLSearchParams(location.search);
 const EXTENSION_ID = params.get("ext");
 
-// Gumroad sends purchaser email automatically
-const email = params.get("email");
-
-if(!EXTENSION_ID || !email){
-  document.body.innerHTML="<h2>Invalid activation link ❌</h2>";
-  throw new Error("Missing parameters");
-}
-
 async function activate(){
+
+  const email = prompt("Enter the email used for purchase:");
+
+  if(!email){
+    document.getElementById("status").innerText="Activation cancelled.";
+    return;
+  }
 
   try{
 
     const res = await fetch(
-      "https://stacktabs-server.onrender.com/check?email=" + encodeURIComponent(email)
+      "https://stacktabs-server.onrender.com/check?email="+encodeURIComponent(email)
     );
 
     const data = await res.json();
 
     if(!data.valid){
-      document.body.innerHTML="<h2>Purchase not verified ❌</h2>";
+      document.getElementById("status").innerText="Payment not found ❌";
       return;
     }
 
@@ -64,13 +59,19 @@ async function activate(){
         type:"LICENSE_VALID",
         expiresAt:data.expiresAt
       },
-      () => {
-        document.body.innerHTML="<h1>StackTabs Pro Activated ✅</h1><p>You can now return to the extension.</p>";
+      (response)=>{
+        if(chrome.runtime.lastError){
+          document.getElementById("status").innerText=
+          "Extension not detected. Please install/reload StackTabs and reopen this page.";
+          return;
+        }
+
+        document.getElementById("status").innerText="StackTabs Pro Activated ✅";
       }
     );
 
   }catch(e){
-    document.body.innerHTML="<h2>Server unreachable ❌</h2>";
+    document.getElementById("status").innerText="Server error. Try again.";
   }
 }
 
