@@ -1,35 +1,35 @@
-<!DOCTYPE html>
-
-<html>
-<head>
-<title>StackTabs Activated</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-</head>
-
-<body style="font-family:Arial;text-align:center;padding:60px">
-
-<h2>Payment Successful 🎉</h2>
-<p>Activating your Pro license...</p>
-
 <script>
 const params = new URLSearchParams(location.search);
 const EXTENSION_ID = params.get("ext");
 
-if(!EXTENSION_ID){
-  document.body.innerHTML="Invalid activation.";
-}else{
+async function activate() {
+
+  const email = prompt("Enter the email you used to purchase:");
+
+  if(!email) return;
+
+  const res = await fetch(
+    "https://stacktabs-license.onrender.com/check?email=" + encodeURIComponent(email)
+  );
+
+  const data = await res.json();
+
+  if(!data.valid){
+    document.body.innerHTML="<h2>Payment not found ❌</h2>";
+    return;
+  }
 
   chrome.runtime.sendMessage(
     EXTENSION_ID,
-    { type:"PAYMENT_SUCCESS" },
+    {
+      type:"LICENSE_VALID",
+      expiresAt:data.expiresAt
+    },
     () => {
-      document.body.innerHTML =
-        "<h2>StackTabs Pro Activated ✅</h2><p>You can now return to the extension.</p>";
+      document.body.innerHTML="<h2>StackTabs Pro Activated ✅</h2>";
     }
   );
-
 }
-</script>
 
-</body>
-</html>
+activate();
+</script>
