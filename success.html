@@ -9,7 +9,7 @@ async function activate() {
   if(!email) return;
 
   const res = await fetch(
-    "https://stacktabs-license.onrender.com/check?email=" + encodeURIComponent(email)
+    "https://stacktabs-server.onrender.com/check?email=" + encodeURIComponent(email)
   );
 
   const data = await res.json();
